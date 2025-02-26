@@ -28,7 +28,7 @@ from .modules.pfam import pfam_fasta
 from .modules.subprocess_functions import align, tree
 from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
-
+from .modules.uniprot_sequences import filter_valid_sequences
 
 logger = logging.getLogger()
 
@@ -159,6 +159,15 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         check_seq_in(seq_record, found_sequences_fastafile, rewrite=True, spaces=False)
 
+        # Filtrar secuencias que no están en UniProt
+        filtered_sequences_fastafile = f"{output_dir}/seqs_blast_filtered.fasta"
+        logger.info("Filtrando secuencias sin referencia en UniProt...")
+        filter_valid_sequences(found_sequences_fastafile, filtered_sequences_fastafile)
+        
+        # Usar el archivo filtrado en los siguientes pasos
+        found_sequences_fastafile = filtered_sequences_fastafile
+
+      
         if cluster_seqs:
             cluster_results = f"{output_dir}/seqs_cluster"
             cluster_results_fastafile = f"{cluster_results}.fasta"
