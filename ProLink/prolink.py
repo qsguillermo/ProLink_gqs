@@ -20,7 +20,7 @@ import os
 from copy import deepcopy
 from datetime import datetime, timezone
 
-from . import __version__, ProLink_path, parameters_default
+from ProLink import __version__, ProLink_path, parameters_default
 from .modules.blast import blast, blast_parse, blast_pro
 from .modules.clustering import cluster_mmseqs, cluster_pro
 from .modules.obtaining_sequences import check_seq_in, get_seq
