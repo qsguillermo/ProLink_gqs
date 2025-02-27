@@ -17,14 +17,16 @@ def check_uniprot_batch(wp_codes):
     set: Conjunto de códigos WP encontrados en UniProt.
     """
     url = "https://rest.uniprot.org/uniprotkb/search"
-    query = " OR ".join(wp_codes)  # Unimos todos los códigos en una sola consulta
+    query = " OR ".join([f"(accession:{wp})" for wp in wp_codes])  # Formato correcto para la API
     params = {"query": query, "fields": "accession", "format": "json"}
 
     try:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
-            return {entry['primaryAccession'] for entry in data.get("results", [])}
+            found_wp_codes = {entry['primaryAccession'] for entry in data.get("results", [])}
+            logger.info(f"Códigos WP encontrados en UniProt: {found_wp_codes}")
+            return found_wp_codes
         else:
             logger.warning(f"Error en la consulta a UniProt: {response.status_code}")
             return set()
@@ -73,3 +75,13 @@ def filter_valid_sequences(input_fasta, output_fasta):
 
     logger.info(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")
     logger.info(f"Resultados guardados en {output_fasta}")
+
+# Cambios en prolink.py (Ejemplo de llamada a la función correcta)
+
+def process_sequences(input_fasta, output_fasta):
+    """
+    Procesa las secuencias de BLAST y filtra las que tienen referencias en UniProt.
+    """
+    logger.info(f"Procesando archivo: {input_fasta}")
+    filter_valid_sequences(input_fasta, output_fasta)
+    logger.info(f"Filtrado completado. Archivo guardado en: {output_fasta}")
