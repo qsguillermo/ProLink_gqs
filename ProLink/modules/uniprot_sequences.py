@@ -24,6 +24,7 @@ def check_uniprot_batch(wp_codes):
 
     try:
         response = requests.get(url, params=params)
+        logger.info(f"Respuesta de UniProt (códigos {wp_codes}): {response.json()}")
         if response.status_code == 200:
             data = response.json()
             valid_entries = {entry['primaryAccession'] for entry in data.get("results", [])}
@@ -50,7 +51,8 @@ def filter_valid_sequences(input_fasta, output_fasta):
     # Extraer códigos WP_ de las descripciones
     wp_data = {}
     for seq in sequences:
-        match = re.search(r'(WP_\d+\.\d+)', seq.description)
+        match = re.search(r'(WP_\d{9}\.\d)', seq.description)
+        logger.info(f"Código WP encontrado en {seq.id}: {match.group(1) if match else 'Ninguno'}")
         if match:
             wp_data[seq.id] = match.group(1)
     
@@ -61,6 +63,8 @@ def filter_valid_sequences(input_fasta, output_fasta):
 
     # Verificar en UniProt en lotes de 100
     wp_codes = list(set(wp_data.values()))  # Evitar códigos duplicados
+    logger.info(f"Total códigos WP extraídos: {len(wp_codes)}")
+    logger.info(f"Códigos WP únicos a consultar: {wp_codes}")
     valid_wp_codes = set()
     batch_size = 100  
 
@@ -73,9 +77,12 @@ def filter_valid_sequences(input_fasta, output_fasta):
         seq for seq in sequences 
         if (seq.id in wp_data and wp_data[seq.id] in valid_wp_codes) or seq.id not in wp_data
     ]
+   
+    logger.info(f"Secuencias válidas encontradas después del filtrado: {[seq.id for seq in valid_sequences]}")
 
     # Guardar el nuevo archivo FASTA solo con secuencias válidas
     SeqIO.write(valid_sequences, output_fasta, "fasta")
+    logger.info(f"Archivo filtrado guardado en {output_fasta} con {len(valid_sequences)} secuencias.")
 
     print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # 🔹 Verificar cuántas secuencias quedan
     
