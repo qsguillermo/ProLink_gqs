@@ -17,7 +17,7 @@ def check_uniprot_batch(wp_codes):
     """
     url = "https://rest.uniprot.org/uniprotkb/search"
     # Prepend each WP code with "accession:" so that the search looks in the accession field
-    query = " OR ".join(f"accession:{wp}" for wp in wp_codes)
+    query = " OR ".join(f"xref_refseq:{wp}" for wp in wp_codes)
     params = {
         "query": query,
         "fields": "accession",
