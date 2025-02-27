@@ -17,16 +17,18 @@ def check_uniprot_batch(wp_codes):
     set: Conjunto de códigos WP encontrados en UniProt.
     """
     url = "https://rest.uniprot.org/uniprotkb/search"
-    query = " OR ".join([f"(accession:{wp})" for wp in wp_codes])  # Formato correcto para la API
+    query = " OR ".join(f'"{wp}"' for wp in wp_codes)  # Agregar comillas para evitar problemas de formato
     params = {"query": query, "fields": "accession", "format": "json"}
+
+    print(f"Consulta a UniProt: {query}")  # 🔹 Verificar qué se envía a UniProt
 
     try:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
-            found_wp_codes = {entry['primaryAccession'] for entry in data.get("results", [])}
-            logger.info(f"Códigos WP encontrados en UniProt: {found_wp_codes}")
-            return found_wp_codes
+            valid_entries = {entry['primaryAccession'] for entry in data.get("results", [])}
+            print(f"Códigos WP encontrados en UniProt: {valid_entries}")  # 🔹 Verificar qué WP devuelve UniProt
+            return valid_entries
         else:
             logger.warning(f"Error en la consulta a UniProt: {response.status_code}")
             return set()
@@ -48,10 +50,12 @@ def filter_valid_sequences(input_fasta, output_fasta):
     # Extraer códigos WP_ de las descripciones
     wp_data = {}
     for seq in sequences:
-        match = re.search(r'(WP_\d{9}\.\d)', seq.description)
+        match = re.search(r'(WP_\d+\.\d+)', seq.description)
         if match:
             wp_data[seq.id] = match.group(1)
-
+    
+    print(f"Códigos WP extraídos: {list(wp_data.values())}")  # 🔹 Verificar los códigos WP extraídos
+    
     logger.info(f"Número total de secuencias: {len(sequences)}")
     logger.info(f"Número de códigos WP encontrados: {len(wp_data)}")
 
@@ -73,15 +77,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
     # Guardar el nuevo archivo FASTA solo con secuencias válidas
     SeqIO.write(valid_sequences, output_fasta, "fasta")
 
+    print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # 🔹 Verificar cuántas secuencias quedan
+    
     logger.info(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")
     logger.info(f"Resultados guardados en {output_fasta}")
-
-# Cambios en prolink.py (Ejemplo de llamada a la función correcta)
-
-def process_sequences(input_fasta, output_fasta):
-    """
-    Procesa las secuencias de BLAST y filtra las que tienen referencias en UniProt.
-    """
-    logger.info(f"Procesando archivo: {input_fasta}")
-    filter_valid_sequences(input_fasta, output_fasta)
-    logger.info(f"Filtrado completado. Archivo guardado en: {output_fasta}")
