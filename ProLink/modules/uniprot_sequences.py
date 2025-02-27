@@ -51,7 +51,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
     # Extraer códigos WP_ de las descripciones
     wp_data = {}
     for seq in sequences:
-        match = re.search(r'(WP_\d{9}\.\d)', seq.description)
+        match = re.search(r'(WP_\d+)', seq.description)  # Extrae solo "WP_xxxxxxxx, sin el .1"
         logger.info(f"Código WP encontrado en {seq.id}: {match.group(1) if match else 'Ninguno'}")
         if match:
             wp_data[seq.id] = match.group(1)
@@ -66,7 +66,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
     logger.info(f"Total códigos WP extraídos: {len(wp_codes)}")
     logger.info(f"Códigos WP únicos a consultar: {wp_codes}")
     valid_wp_codes = set()
-    batch_size = 100  
+    batch_size = 50  
 
     for i in range(0, len(wp_codes), batch_size):
         batch = wp_codes[i:i+batch_size]
