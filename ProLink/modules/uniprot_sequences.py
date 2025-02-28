@@ -15,7 +15,7 @@ def check_uniprot_batch(wp_codes):
     Returns:
     set: Set of WP codes found in UniProt.
     """
-    url = "https://rest.uniprot.org/uniprotkb/search"
+    url = "https://rest.uniprot.org/uniprotkb/search?query={wp_code}"
     # Prepend each WP code with "accession:" so that the search looks in the accession field
     query = " OR ".join(f"xref_refseq:{wp}" for wp in wp_codes)
     params = {
