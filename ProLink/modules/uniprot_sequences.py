@@ -53,7 +53,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
     wp_data = {}
     for seq in sequences:
         match = re.search(r'(WP_\d{9}\.\d)', seq.description)
-        logger.info(f"Código WP encontrado en {seq.id}: {match.group(1) if match else 'Ninguno'}")
+        #logger.info(f"Código WP encontrado en {seq.id}: {match.group(1) if match else 'Ninguno'}")
         if match:
             wp_data[seq.id] = match.group(1)
     
@@ -62,12 +62,12 @@ def filter_valid_sequences(input_fasta, output_fasta):
     logger.info(f"Número total de secuencias: {len(sequences)}")
     logger.info(f"Número de códigos WP encontrados: {len(wp_data)}")
 
-    # Verify in UniProt in batches (using batch size of 50)
+    # Verify in UniProt in batches (using batch size of 100)
     wp_codes = list(set(wp_data.values()))  # Remove duplicate codes
     logger.info(f"Total códigos WP extraídos: {len(wp_codes)}")
     #logger.info(f"Códigos WP únicos a consultar: {wp_codes}")
     valid_wp_codes = set()
-    batch_size = 50  
+    batch_size = 100  
 
     for i in range(0, len(wp_codes), batch_size):
         batch = wp_codes[i:i+batch_size]
