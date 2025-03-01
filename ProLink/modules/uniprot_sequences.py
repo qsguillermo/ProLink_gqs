@@ -15,9 +15,23 @@ def check_uniprot_batch(wp_codes):
     Returns:
     set: Set of WP codes found in UniProt.
     """
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        response.raise_for_status()
+        data = response.json()
+    
+        print("🔹 Respuesta de UniProt:", data)  # DEBUG: Muestra la respuesta completa
+        
+        valid_entries = {entry['primaryAccession'] for entry in data.get("results", [])}
+        return valid_entries
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error al conectar con UniProt: {e}")
+        return set()
+
+    
     url = "https://rest.uniprot.org/uniprotkb/search"
     # Prepend each WP code with "accession:" so that the search looks in the accession field
-    queries = [f"xref:RefSeq-{wp_code}" for wp_code in wp_codes]
+    queries = [f"accession:{wp_code}" for wp_code in wp_codes]
     query = " OR ".join(queries)
     params = {
         "query": query,
