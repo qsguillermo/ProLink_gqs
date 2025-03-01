@@ -15,7 +15,7 @@ def check_uniprot_batch(wp_codes):
     Returns:
     set: Set of WP codes found in UniProt.
     """
-    url = "https://rest.uniprot.org/uniprotkb/search?query={wp_code}"
+    url = "https://rest.uniprot.org/uniprotkb/search"
     # Prepend each WP code with "accession:" so that the search looks in the accession field
     query = " OR ".join(f"xref_refseq:{wp}" for wp in wp_codes)
     params = {
@@ -55,7 +55,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
         match = re.search(r'(WP_\d{9}\.\d)', seq.description)
         #logger.info(f"Código WP encontrado en {seq.id}: {match.group(1) if match else 'Ninguno'}")
         if match:
-            wp_data[seq.id] = match.group(1)
+            wp_data[seq.description] = match.group(1)
     
     print(f"Códigos WP extraídos: {list(wp_data.values())}")  # Debug: show extracted WP codes
     
@@ -75,8 +75,8 @@ def filter_valid_sequences(input_fasta, output_fasta):
 
     # Filter valid sequences
     valid_sequences = [
-        seq for seq in sequences 
-        if (seq.id in wp_data and wp_data[seq.id] in valid_wp_codes) or seq.id not in wp_data
+    seq for seq in sequences 
+    if seq.description not in wp_data or wp_data[seq.description] in valid_wp_codes
     ]
    
     #logger.info(f"Secuencias válidas encontradas después del filtrado: {[seq.id for seq in valid_sequences]}")
