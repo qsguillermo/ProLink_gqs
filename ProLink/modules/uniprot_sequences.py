@@ -23,7 +23,7 @@ def check_uniprot_batch(wp_codes):
         "query": query,
         "fields": "accession",
         "format": "json",
-        "size": len(wp_codes)  # Ensure we get as many results as the number of queries in the batch
+        "size": len(wp_codes) # Ensure we get as many results as the number of queries in the batch
     }
 
     print(f"Consulta a UniProt: {query}")  # Debug: check what is being sent to UniProt
