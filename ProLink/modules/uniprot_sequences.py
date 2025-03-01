@@ -20,7 +20,7 @@ def check_uniprot_batch(wp_codes):
     queries = [f"xref:RefSeq-{wp_code}" for wp_code in wp_codes]
     params = {
         "query": query,
-        "fields": "accession"
+        "fields": "accession",
         "format": "json",
         "size": len(wp_codes)  # Ensure we get as many results as the number of queries in the batch
     }
