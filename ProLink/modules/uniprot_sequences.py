@@ -19,7 +19,7 @@ def check_uniprot_batch(wp_codes):
     """
    
     # Prepend each WP code with "accession:" so that the search looks in the accession field
-    queries = [f"xref:RefSeq:{wp_code}" for wp_code in wp_codes]
+    queries = [f"xref:RefSeq-{wp_code}" for wp_code in wp_codes]
     query = " OR ".join(queries)
     params = {
         "query": query,
