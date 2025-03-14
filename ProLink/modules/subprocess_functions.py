@@ -7,28 +7,67 @@ from .. import ProLink_path
 
 logger = logging.getLogger()
 
-def clean_newick_labels(newick_str, protein_name='alkene_reductase'):
+import re  # Ensure the regex module is imported
+
+def clean_label(label, protein_name='alkene_reductase'):
     """
-    Cleans the labels in a Newick tree by removing:
+    Cleans a single Newick label by removing:
       - WP codes (pattern: WP_\d{9}\.\d)
-      - The word "MULTISPECIES:" if present
+      - The term "MULTISPECIES:" if present
       - The protein name (default 'alkene_reductase')
-      - The trailing "Same_Domains" (and similar variants with hyphens or spaces)
+      - Trailing "Same Domains" (or similar variants)
+    Then, it extracts and returns only the species name and the cluster marker.
     
-    Returns the cleaned Newick string.
+    For example, from:
+      WP_058328214.1_alkene_reductase_Sinorhizobium_sp._Sb3_---C28---Same_Domains
+    it returns:
+      Sinorhizobium_sp._Sb3_---C28
     """
-    # Remove WP codes (e.g., WP_058328214.1)
-    newick_str = re.sub(r'WP_\d{9}\.\d', '', newick_str)
+    # Remove any surrounding quotes
+    label = label.strip("'\"")
+    # Remove WP codes
+    label = re.sub(r"WP_\d{9}\.\d", "", label)
     # Remove "MULTISPECIES:" if present
-    newick_str = re.sub(r'MULTISPECIES:\s*', '', newick_str, flags=re.IGNORECASE)
+    label = re.sub(r"MULTISPECIES:\s*", "", label, flags=re.IGNORECASE)
     # Remove the protein name
-    newick_str = re.sub(protein_name, '', newick_str, flags=re.IGNORECASE)
-    # Remove trailing "Same_Domains" (with potential hyphens or spaces)
-    newick_str = re.sub(r'[-_]*Same[_\s]*Domains', '', newick_str, flags=re.IGNORECASE)
-    # Replace multiple underscores with a single underscore and clean extra spaces
-    newick_str = re.sub(r'_+', '_', newick_str)
-    newick_str = re.sub(r'\s+', ' ', newick_str)
-    return newick_str.strip()
+    label = re.sub(protein_name, "", label, flags=re.IGNORECASE)
+    # Remove variants of "Same Domains" (with hyphens, underscores, or spaces)
+    label = re.sub(r"[-_]*Same[_\s]*Domains", "", label, flags=re.IGNORECASE)
+    # Clean extra spaces and underscores from the beginning and end
+    label = label.strip(" _")
+    
+    # Use a regex to extract the species name and the cluster marker.
+    # We assume that the cluster marker starts with '---C' followed by digits.
+    pattern = re.compile(
+        r"(?P<species>[A-Za-z0-9]+(?:[_\s][A-Za-z0-9\.]+)*)"  # species name: letters/numbers with underscores or spaces
+        r"[\s_-]+(?P<cluster>---C\d+)",                       # cluster marker: ---C followed by digits
+        flags=re.IGNORECASE
+    )
+    match = pattern.search(label)
+    if match:
+        species = match.group('species').strip().replace(" ", "_")
+        cluster = match.group('cluster').strip()
+        return f"{species}_{cluster}"
+    else:
+        # If the pattern is not found, return the cleaned label as is
+        return label
+
+def clean_newick_string(newick_str, protein_name='alkene_reductase'):
+    """
+    Cleans all labels in a Newick tree string by applying the clean_label function.
+    It looks for any substring that contains a cluster marker (---C followed by digits)
+    and replaces it with the cleaned version.
+    """
+    # Pattern to match labels that include the cluster marker. It matches labels that are
+    # either quoted (single or double) or not quoted.
+    pattern = re.compile(
+        r"('([^']+---C\d+[^']*)'|\"([^\"]+---C\d+[^\"]*)\"|([A-Za-z0-9 _\.\-]+---C\d+))",
+        flags=re.IGNORECASE
+    )
+    def replacer(match):
+        full_label = match.group(0)
+        return clean_label(full_label, protein_name)
+    return pattern.sub(replacer, newick_str)
 
 
 def align(muscle_input:str, muscle_output:str) -> None:
@@ -78,7 +117,7 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
     try:
         with open(mega_output, 'r') as f:
             newick = f.read()
-        cleaned_newick = clean_newick_labels(newick)
+        cleaned_newick = clean_newick_string(newick, protein_name='alkene_reductase')
         with open(mega_output, 'w') as f:
             f.write(cleaned_newick)
         logging.info(f"Cleaned Newick tree saved in '{mega_output}'")
