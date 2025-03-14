@@ -7,8 +7,6 @@ from .. import ProLink_path
 
 logger = logging.getLogger()
 
-import re  # Ensure the regex module is imported
-
 def clean_label(label, protein_name='alkene_reductase'):
     """
     Cleans a single Newick label by removing:
