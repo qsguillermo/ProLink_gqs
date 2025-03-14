@@ -18,17 +18,23 @@ def clean_label(label, protein_name='alkene_reductase'):
     
     For example, from:
       WP_058328214.1_alkene_reductase_Sinorhizobium_sp._Sb3_---C28---Same_Domains
+    or
+      WP 062476070.1 MULTISPECIES: alkene reductase unclassified Rhizobium ---C22---Same Domains
     it returns:
       Sinorhizobium_sp._Sb3_---C28
     """
     # Remove any surrounding quotes
     label = label.strip("'\"")
     # Remove WP codes
-    label = re.sub(r"WP_\d{9}\.\d", "", label)
+    label = re.sub(r"WP[\s_]\d{9}\.\d", "", label)
     # Remove "MULTISPECIES:" if present
     label = re.sub(r"MULTISPECIES:\s*", "", label, flags=re.IGNORECASE)
     # Remove the protein name
-    label = re.sub(protein_name, "", label, flags=re.IGNORECASE)
+    # Allow both underscore and space in the protein name (e.g., "alkene_reductase" or "alkene reductase")
+    protein_regex = re.escape(protein_name).replace(r'\_', r'[\s_]+')
+    label = re.sub(protein_regex, "", label, flags=re.IGNORECASE)
+    # Remove the word "unclassified"
+    label = re.sub(r"\bunclassified\b", "", label, flags=re.IGNORECASE)
     # Remove variants of "Same Domains" (with hyphens, underscores, or spaces)
     label = re.sub(r"[-_]*Same[_\s]*Domains", "", label, flags=re.IGNORECASE)
     # Clean extra spaces and underscores from the beginning and end
