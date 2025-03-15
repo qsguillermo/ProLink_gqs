@@ -1,6 +1,8 @@
 
 import logging
 import subprocess
+import time
+import os
 import re
 
 from .. import ProLink_path
@@ -108,14 +110,28 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
     mega_output : str
         Path of the MEGA-CC output file
     '''
+    # Build the path to the MEGA-CC configuration file
     mega_config_input = f"{ProLink_path}/mega_configs/{tree_type}_{bootstrap_replications}.mao"
     logging.info(f"\n-- Generating phylogenetic tree with MEGA-CC")
     mega_cmd = ['megacc', '-a', mega_config_input, '-d', muscle_output, '-o', mega_output]
     logging.debug(f"Running MEGA-CC: {' '.join(mega_cmd)}")
-    mega_run = subprocess.run(mega_cmd)
+
+    # Capture stdout and stderr to review MEGA-CC messages
+    mega_run = subprocess.run(mega_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    logger.debug(f"MEGA-CC stdout: {mega_run.stdout}")
+    logger.debug(f"MEGA-CC stderr: {mega_run.stderr}")
     if mega_run.returncode != 0:
-        logger.error(f"ERROR: MEGA-CC failed")
-        raise RuntimeError(f"MEGA-CC failed")
+        logger.error("ERROR: MEGA-CC failed")
+        raise RuntimeError("MEGA-CC failed")
+    
+    # Wait for a few seconds to give time for the output file to be written
+    time.sleep(5)
+    
+    # Verify that the output file exists before attempting to clean it
+    if not os.path.exists(mega_output):
+        logger.error(f"ERROR: MEGA-CC did not produce the output file: {mega_output}")
+        raise FileNotFoundError(f"Output file {mega_output} not found")
+    
 
     # Read the generated Newick tree and clean its labels
     try:
