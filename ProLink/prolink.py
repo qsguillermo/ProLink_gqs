@@ -220,7 +220,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
                     weblogo3(aligned_fastafile, weblogo_output_trim, weblogo_format)
             if generate_tree:
                 logger.info("\nGenerating tree")
-                mega_output = f"{aligned_fastafile}.mega"
+                mega_output = f"{aligned_fastafile}.nwk"
                 tree(tree_type, bootstrap_replications, aligned_fastafile, mega_output)
         else:
             logger.info("\nSkipping alignment (and logo and tree))")
