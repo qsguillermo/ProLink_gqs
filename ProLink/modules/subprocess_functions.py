@@ -129,8 +129,14 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
     
     # Verify that the output file exists before attempting to clean it
     if not os.path.exists(mega_output):
-        logger.error(f"ERROR: MEGA-CC did not produce the output file: {mega_output}")
-        raise FileNotFoundError(f"Output file {mega_output} not found")
+        # If the expected file with .nwk is not found, try the alternative with .mega
+        alternative = mega_output.rsplit('.', 1)[0] + ".mega"
+        if os.path.exists(alternative):
+            logging.info(f"Using alternative output file: {alternative}")
+            mega_output = alternative
+        else:
+            logger.error(f"ERROR: MEGA-CC did not produce the output file: {mega_output}")
+            raise FileNotFoundError(f"Output file {mega_output} not found")
     
 
     # Read the generated Newick tree and clean its labels
