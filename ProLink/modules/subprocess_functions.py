@@ -45,8 +45,8 @@ def clean_label(label, protein_name='alkene_reductase'):
     # Use a regex to extract the species name and the cluster marker.
     # We assume that the cluster marker starts with '---C' followed by digits.
     pattern = re.compile(
-        r"(?P<species>[A-Za-z0-9]+(?:[_\s][A-Za-z0-9\.]+)*)"  # species name: letters/numbers with underscores or spaces
-        r"[\s_-]+(?P<cluster>---C\d+)",                       # cluster marker: ---C followed by digits
+        r"\b(?P<species>[A-Z][a-zA-Z0-9_]*\s+[a-zA-Z0-9_\.\-]+(?:\s+[a-zA-Z0-9_\.\-]+)*)\b"  # species name: letters/numbers with underscores or spaces
+        r"[\s_-]+(?P<cluster>---C\d+)",                                                      # cluster marker: ---C followed by digits
         flags=re.IGNORECASE
     )
     match = pattern.search(label)
