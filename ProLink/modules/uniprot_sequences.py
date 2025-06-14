@@ -49,7 +49,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
     # Extract WP_ codes from sequence descriptions
     wp_data = {}
     for seq in sequences:
-        match = re.search(r'(WP_\d{9}\.\d)', seq.description)
+        match = re.search(r'((?:WP|XP|NP)_\d{9}\.\d)', seq.description)
         if match:
             wp_data[seq.description] = match.group(1)
     
