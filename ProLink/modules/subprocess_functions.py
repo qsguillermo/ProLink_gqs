@@ -100,7 +100,7 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
         with open(mega_output, 'w') as f:
             f.write(cleaned_newick)
         logging.info(f"Cleaned Newick tree saved in '{mega_output}'")
-        logging.info("✅ Módulo de limpieza personalizado ejecutado correctamente")
+        logging.info("✅ Testing_abb")
     except Exception as e:
         logger.error(f"ERROR while cleaning the Newick file: {e}")
         raise
