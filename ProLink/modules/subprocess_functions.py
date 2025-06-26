@@ -9,20 +9,20 @@ from .. import ProLink_path
 
 logger = logging.getLogger()
 
-def clean_label(text, protein_name='alkene_reductase'):
+def clean_label(label, protein_name='alkene_reductase'):
     # Elimina códigos WP/XP/NP
-    text = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', text)
+    label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
     # Elimina "MULTISPECIES:" y descripciones
-    text = re.sub(r'MULTISPECIES:\s*', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'alkene[\s_]+reductase', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'nitroreductase[\s_]+family[\s_]+protein', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'unclassified', '', text, flags=re.IGNORECASE)
-    text = re.sub(r'Same[\s_]+Domains', '', text, flags=re.IGNORECASE)
+    label = re.sub(r'MULTISPECIES:\s*', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'alkene[\s_]+reductase', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'nitroreductase[\s_]+family[\s_]+protein', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
     # Elimina guiones o caracteres residuales
-    text = re.sub(r'[-]*', '', text).strip()
+    label = re.sub(r'[-]*', '', label).strip()
     # Abrevia el género si no es sp.
-    text = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', text)
-    return text.strip(" _")
+    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', label)
+    return label.strip(" _")
 
 def clean_newick_string(newick_str, protein_name='alkene_reductase'):
     pattern = re.compile(
