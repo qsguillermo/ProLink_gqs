@@ -1,4 +1,4 @@
-# ***ProLink 1.1***
+# ***ProLink_gqs***
 
 [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1qjRMdWDY6u5rk7nhlzVgjczYxAf9mJWQ#scrollTo=3NB4KSVI_MHB)
 
