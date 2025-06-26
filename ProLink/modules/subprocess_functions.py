@@ -46,6 +46,7 @@ def align(muscle_input:str, muscle_output:str) -> None:
 def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_output:str) -> None:
     mega_config_input = f"{ProLink_path}/mega_configs/{tree_type}_{bootstrap_replications}.mao"
     logging.info(f"\n-- Generating phylogenetic tree with MEGA-CC")
+    logging.info(f"funciona testing_abb")
     mega_cmd = ['megacc', '-a', mega_config_input, '-d', muscle_output, '-o', mega_output]
     logging.debug(f"Running MEGA-CC: {' '.join(mega_cmd)}")
 
