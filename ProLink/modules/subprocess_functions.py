@@ -9,7 +9,7 @@ from .. import ProLink_path
 
 logger = logging.getLogger()
 
-def clean_label(label, protein_name='alkene_reductase'):
+def clean_label(text, protein_name='alkene_reductase'):
     # Elimina códigos WP/XP/NP
     text = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', text)
     # Elimina "MULTISPECIES:" y descripciones
