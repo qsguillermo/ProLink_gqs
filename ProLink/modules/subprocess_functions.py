@@ -10,45 +10,19 @@ from .. import ProLink_path
 logger = logging.getLogger()
 
 def clean_label(label, protein_name='alkene_reductase'):
-    """
-    Cleans a single Newick label by removing:
-      - WP codes (pattern: WP_\d{9}\.\d)
-      - The term "MULTISPECIES:" if present
-      - The protein name (default 'alkene_reductase')
-      - Trailing "Same Domains" (or similar variants)
-    Then, it extracts and returns only the species name and the cluster marker,
-    abbreviating the genus name if possible.
-    """
-    label = label.strip("'\"")
-    label = re.sub(r"WP[\s_]\d{9}\.\d", "", label)
-    label = re.sub(r"MULTISPECIES:\s*", "", label, flags=re.IGNORECASE)
-    protein_regex = re.escape(protein_name).replace(r'\_', r'[\s_]+')
-    label = re.sub(protein_regex, "", label, flags=re.IGNORECASE)
-    label = re.sub(r"\bunclassified\b", "", label, flags=re.IGNORECASE)
-    label = re.sub(r"[-_]*Same[_\s]*Domains", "", label, flags=re.IGNORECASE)
-    label = label.strip(" _")
-
-    pattern = re.compile(
-        r"(?P<species>[A-Z][a-zA-Z0-9_\/]*(?:[\s_]+[a-zA-Z0-9_\/\.\-]+)*)"
-        r"[\s_-]+(?P<cluster>---C\d+)",
-        flags=re.IGNORECASE
-    )
-    match = pattern.search(label)
-    if match:
-        species = match.group('species').strip().replace(" ", "_")
-        cluster = match.group('cluster').strip()
-
-        # Abreviar el género si es posible y no es "sp."
-        parts = species.split("_")
-        if len(parts) >= 2 and not parts[1].startswith("sp"):
-            genus_initial = parts[0][0]
-            species_abbr = f"{genus_initial}_{'_'.join(parts[1:])}"
-        else:
-            species_abbr = species
-
-        return f"{species_abbr}_{cluster}"
-    else:
-        return label
+    # Elimina códigos WP/XP/NP
+    label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
+    # Elimina "MULTISPECIES:" y descripciones
+    label = re.sub(r'MULTISPECIES:\s*', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'alkene[\s_]+reductase', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'nitroreductase[\s_]+family[\s_]+protein', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
+    # Elimina guiones o caracteres residuales
+    label = re.sub(r'[-]*', '', label).strip()
+    # Abrevia el género si no es sp.
+    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', label)
+    return label.strip(" _")
 
 def clean_newick_string(newick_str, protein_name='alkene_reductase'):
     pattern = re.compile(
@@ -100,7 +74,8 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
         with open(mega_output, 'w') as f:
             f.write(cleaned_newick)
         logging.info(f"Cleaned Newick tree saved in '{mega_output}'")
-        logging.info("✅ Módulo de limpieza personalizado ejecutado correctamente")
+        logging.info("✅ cleaned_and_abb")
     except Exception as e:
         logger.error(f"ERROR while cleaning the Newick file: {e}")
         raise
+        
