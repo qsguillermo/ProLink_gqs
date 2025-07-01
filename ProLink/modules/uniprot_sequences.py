@@ -74,7 +74,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
 
 import csv
 
-wp_codes = list(wp_data)
+wp_codes = list(wp_data.values())
 
 output_file = "annotation.csv"
 results = []
