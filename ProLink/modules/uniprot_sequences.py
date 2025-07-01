@@ -62,6 +62,9 @@ def filter_valid_sequences(input_fasta, output_fasta):
     # Verify each WP code in UniProt individually
     valid_wp_codes = {wp for wp in wp_data.values() if check_uniprot_single(wp)}
 
+    # try to run the annotation
+    annotate_uniprot_codes(valid_wp_codes)
+    
     # Filter valid sequences
     valid_sequences = [
         seq for seq in sequences 
