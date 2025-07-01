@@ -1,6 +1,7 @@
 import requests
 import re
 import logging
+import csv
 from Bio import SeqIO  # To properly handle FASTA files
 
 logger = logging.getLogger()
@@ -72,41 +73,44 @@ def filter_valid_sequences(input_fasta, output_fasta):
     print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # Debug: Show number of valid sequences
     logger.info(f"Resultados guardados en {output_fasta}")
 
-import csv
+def annotate_uniprot_codes(wp_data, output_file="annotation.csv"):
+    results = []
 
-wp_codes = list(wp_data.values())
+    for wp in wp_data.values():
+        query_string = f"({wp})"
+        params = {
+            "fields": "accession",
+            "query": query_string,
+            "format": "json"
+        }
 
-output_file = "annotation.csv"
-results = []
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
 
-for wp in wp_codes:
-    query_string = f"({wp})"  # búsqueda libre
-    params = {
-        "fields": "accession",
-        "query": query_string,
-        "format": "json"
-    }
-
-    response = requests.get("https://rest.uniprot.org/uniprotkb/search", params=params)
-    data = response.json()
-
-    if data.get("results"):
-        for r in data["results"]:
-            primary_accession = r.get("primaryAccession", "Not found")
+            if data.get("results"):
+                for r in data["results"]:
+                    primary_accession = r.get("primaryAccession", "Not found")
+                    results.append({
+                        "WP_code": wp,
+                        "UniProt_primaryAccession": primary_accession
+                    })
+            else:
+                results.append({
+                    "WP_code": wp,
+                    "UniProt_primaryAccession": "Not found"
+                })
+        except Exception as e:
+            logger.error(f"Error al consultar {wp}: {e}")
             results.append({
                 "WP_code": wp,
-                "UniProt_primaryAccession": primary_accession
+                "UniProt_primaryAccession": "error"
             })
-    else:
-        results.append({
-            "WP_code": wp,
-            "UniProt_primaryAccession": "Not found"
-        })
 
-# Escribir resultados al CSV
-with open(output_file, mode="w", newline="") as file:
-    writer = csv.DictWriter(file, fieldnames=["WP_code", "UniProt_primaryAccession"], delimiter=';')
-    writer.writeheader()
-    writer.writerows(results)
-    logger.info (f"\n✅ Archivo CSV_annotation generado: {output_file}")
-
+    with open(output_file, mode="w", newline="") as file:
+        writer = csv.DictWriter(file, fieldnames=["WP_code", "UniProt_primaryAccession"], delimiter=';')
+        writer.writeheader()
+        writer.writerows(results)
+    
+    logger.info(f"✅ Archivo CSV generado: {output_file}")
