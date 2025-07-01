@@ -73,10 +73,18 @@ def filter_valid_sequences(input_fasta, output_fasta):
     print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # Debug: Show number of valid sequences
     logger.info(f"Resultados guardados en {output_fasta}")
 
-def annotate_uniprot_codes(wp_data, output_file="annotation.csv"):
+def annotate_uniprot_codes(valid_wp_codes, output_file="annotation.csv"):
     results = []
+    
+    """
+    Annotates UniProt codes.
 
-    for wp in wp_data.values():
+    Parameters:
+    valid_wp_codes (iterable of str): WP codes to annotate (can be set, list, etc.)
+    output_file (str): Output CSV file name.
+    """
+    
+    for wp in valid_wp_codes:
         query_string = f"({wp})"
         params = {
             "fields": "accession",
