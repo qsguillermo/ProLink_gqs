@@ -74,11 +74,11 @@ def filter_valid_sequences(input_fasta, output_fasta):
     logger.info(f"Resultados guardados en {output_fasta}")
 
     try:
-    annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
-    print("annotate_uniprot_codes completed successfully.")
+        annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
+        print("annotate_uniprot_codes completed successfully.")
     except Exception as e:
-    logger.warning(f"annotate_uniprot_codes failed: {e}")
-    print(f"Warning: Anotacion fallida: {e}")
+        logger.warning(f"annotate_uniprot_codes failed: {e}")
+        print(f"Warning: Anotacion fallida: {e}")
 
 def annotate_uniprot_codes(valid_wp_codes, output_file="annotation.csv"):
     results = []
