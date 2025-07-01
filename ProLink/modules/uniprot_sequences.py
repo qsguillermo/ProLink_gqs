@@ -61,9 +61,6 @@ def filter_valid_sequences(input_fasta, output_fasta):
 
     # Verify each WP code in UniProt individually
     valid_wp_codes = {wp for wp in wp_data.values() if check_uniprot_single(wp)}
-
-    # try to run the annotation
-    annotate_uniprot_codes(valid_wp_codes)
     
     # Filter valid sequences
     valid_sequences = [
@@ -75,6 +72,13 @@ def filter_valid_sequences(input_fasta, output_fasta):
     SeqIO.write(valid_sequences, output_fasta, "fasta")
     print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # Debug: Show number of valid sequences
     logger.info(f"Resultados guardados en {output_fasta}")
+
+    try:
+    annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
+    print("annotate_uniprot_codes completed successfully.")
+    except Exception as e:
+    logger.warning(f"annotate_uniprot_codes failed: {e}")
+    print(f"Warning: Anotacion fallida: {e}")
 
 def annotate_uniprot_codes(valid_wp_codes, output_file="annotation.csv"):
     results = []
