@@ -170,7 +170,7 @@ def annotate_uniprot_codes(valid_wp_codes, output_file="annotationE4.csv"):
 
             if data.get("results"):
                 for r in data["results"]:
-                    print(f"DEBUG r: {r}")  # DEBUG
+                    #print(f"DEBUG r: {r}")  # DEBUG
 
                     protein_data = r.get("proteinDescription")
                     if not isinstance(protein_data, dict):
