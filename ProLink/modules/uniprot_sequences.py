@@ -80,7 +80,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
         logger.warning(f"annotate_uniprot_codes failed: {e}")
         print(f"Warning: Anotacion fallida: {e}")
 
-ef extract_protein_name(protein_data):
+def extract_protein_name(protein_data):
     """
     Extrae el mejor nombre posible para la proteína:
     1. recommendedName
