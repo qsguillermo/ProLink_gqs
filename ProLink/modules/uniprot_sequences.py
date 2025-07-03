@@ -152,7 +152,53 @@ def get_cofactors_from_accession(accession):
 
     return "; ".join(cofactors) if cofactors else "None"
 
-def annotate_uniprot_codes(valid_wp_codes, output_file="annotationE4.csv"):
+def get_pfam_domains_from_accession(accession):
+    """
+    Extrae dominios Pfam (id y EntryName) desde una entrada de UniProt.
+    """
+    url_entry = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    try:
+        response = requests.get(url_entry)
+        response.raise_for_status()
+        entry = response.json()
+    except Exception as e:
+        print(f"❌ Error al obtener Pfam para {accession}: {e}")
+        return "Error"
+
+    pfam_domains = []
+
+    for xref in entry.get("uniProtKBCrossReferences", []):
+        if xref.get("database") == "Pfam":
+            pfam_id = xref.get("id", "NoID")
+            entry_name = None
+            for prop in xref.get("properties", []):
+                if prop.get("key") == "EntryName":
+                    entry_name = prop.get("value", "NoEntryName")
+                    break
+            pfam_domains.append(f"{pfam_id} ({entry_name})" if entry_name else pfam_id)
+
+    return "; ".join(pfam_domains) if pfam_domains else "None"
+
+def get_alphafold_id_from_accession(accession):
+    """
+    Extrae el ID de AlphaFoldDB desde una entrada de UniProt.
+    """
+    url_entry = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    try:
+        response = requests.get(url_entry)
+        response.raise_for_status()
+        entry = response.json()
+    except Exception as e:
+        print(f"❌ Error al obtener AlphaFoldDB para {accession}: {e}")
+        return "Error"
+
+    for xref in entry.get("uniProtKBCrossReferences", []):
+        if xref.get("database") == "AlphaFoldDB":
+            return xref.get("id", "NoID")
+
+    return "None"
+
+def annotate_uniprot_codes(valid_wp_codes, output_file="annotation.csv"):
     results = []
 
     for wp in valid_wp_codes:
@@ -181,6 +227,10 @@ def annotate_uniprot_codes(valid_wp_codes, output_file="annotationE4.csv"):
                     accession = r.get("primaryAccession", "Not found")
 
                     cofactors = get_cofactors_from_accession(accession) if accession != "Not found" else "None"
+                    pfam_domains = get_pfam_domains_from_accession(accession) if accession != "Not found" else "None"
+                    alphafold_id = get_alphafold_id_from_accession(accession) if accession != "Not found" else "None"
+
+
 
                     results.append({
                         "WP_code": wp,
@@ -188,7 +238,9 @@ def annotate_uniprot_codes(valid_wp_codes, output_file="annotationE4.csv"):
                         "Organism": r.get("organism", {}).get("scientificName", "Not found"),
                         "Protein_name": protein_name,
                         "EC_number": ec_number,
-                        "Cofactors": cofactors
+                        "Cofactors": cofactors,
+                        "Pfam_domains": pfam_domains,
+                        "AlphaFoldDB_ID": alphafold_id
                     })
             else:
                 results.append({
@@ -197,7 +249,9 @@ def annotate_uniprot_codes(valid_wp_codes, output_file="annotationE4.csv"):
                     "Organism": "Not found",
                     "Protein_name": "Not found",
                     "EC_number": "None",
-                    "Cofactors": "None"
+                    "Cofactors": "None",
+                    "Pfam_domains": "None",
+                    "AlphaFoldDB_ID": "None"
                 })
         except Exception as e:
             print(f"❌ Error al consultar {wp}: {e}")
@@ -207,11 +261,13 @@ def annotate_uniprot_codes(valid_wp_codes, output_file="annotationE4.csv"):
                 "Organism": "error",
                 "Protein_name": "error",
                 "EC_number": "error",
-                "Cofactors": "error"
+                "Cofactors": "error",
+                "Pfam_domains": "error",
+                "AlphaFoldDB_ID": "error"
             })
 
     with open(output_file, mode="w", newline="", encoding="utf-8") as file:
-        fieldnames = ["WP_code", "UniProt_accession", "Organism", "Protein_name", "EC_number", "Cofactors"]
+        fieldnames = ["WP_code", "UniProt_accession", "Organism", "Protein_name", "EC_number", "Cofactors", "Pfam_domains", "AlphaFoldDB_ID"]
         writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter=';')
         writer.writeheader()
         writer.writerows(results)
