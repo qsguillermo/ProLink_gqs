@@ -28,7 +28,7 @@ from .modules.pfam import pfam_fasta
 from .modules.subprocess_functions import align, tree
 from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
-from .modules.uniprot_sequences import filter_valid_sequences
+from .modules.uniprot_sequences import filter_valid_sequences, annotate_uniprot_codes
 
 logger = logging.getLogger()
 
@@ -76,6 +76,8 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
     additional_hits = int(parameters['additional_hits'])
     #Filtering
     filter_uniprot = bool(parameters['filter_uniprot'])
+    #Annotation
+    annotation_uniprot = bool(parameters['annotation_uniprot'])
     # Clustering
     cluster_seqs = bool(parameters['cluster_seqs'])
     identity_cluster = float(parameters['identity_cluster'])
