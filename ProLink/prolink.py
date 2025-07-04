@@ -179,6 +179,12 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         #optional annotation
         if annotation_uniprot:
           logger.info(f"\n###  Annotating  ###\n")
+          try:
+            annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
+            print("annotate_uniprot_codes completed successfully.")
+          except Exception as e:
+            logger.warning(f"annotate_uniprot_codes failed: {e}")
+            print(f"Warning: Anotacion fallida: {e}")
 
     
         if cluster_seqs:
