@@ -72,14 +72,7 @@ def filter_valid_sequences(input_fasta, output_fasta):
     SeqIO.write(valid_sequences, output_fasta, "fasta")
     print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # Debug: Show number of valid sequences
     logger.info(f"Resultados guardados en {output_fasta}")
-
-    try:
-        annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
-        print("annotate_uniprot_codes completed successfully.")
-    except Exception as e:
-        logger.warning(f"annotate_uniprot_codes failed: {e}")
-        print(f"Warning: Anotacion fallida: {e}")
-
+    
 def extract_protein_name(protein_data):
     """
     Extrae el mejor nombre posible para la proteína:
