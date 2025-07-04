@@ -176,6 +176,10 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         else:
           logger.info("Skipping Filtering Sequences (filter_uniprot = False).")
 
+        #optional annotation
+        if annotation_uniprot:
+          logger.info(f"\n###  Annotating  ###\n")
+
     
         if cluster_seqs:
             cluster_results = f"{output_dir}/seqs_cluster"
