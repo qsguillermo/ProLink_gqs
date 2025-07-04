@@ -265,4 +265,4 @@ def annotate_uniprot_codes(valid_wp_codes, output_file="annotation.csv"):
         writer.writeheader()
         writer.writerows(results)
 
-    print(f"✅ Archivo CSV generado: {output_file}")
+    print(f"✅ Archivo CSV generado en: {output_file}")
