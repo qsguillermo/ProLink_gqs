@@ -13,6 +13,9 @@ Blast:
 
 Filtering:
   filter_uniprot: False
+
+Annotation:
+  annotation_uniprot: False
   
 Clustering:
   cluster_seqs: False
