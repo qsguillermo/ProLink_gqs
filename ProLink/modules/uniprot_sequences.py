@@ -1,6 +1,7 @@
 import requests
 import re
 import logging
+import csv
 from Bio import SeqIO  # To properly handle FASTA files
 
 logger = logging.getLogger()
@@ -56,11 +57,11 @@ def filter_valid_sequences(input_fasta, output_fasta):
     print(f"Códigos WP extraídos: {list(wp_data.values())}")  # Debug: Show extracted WP codes
     
     logger.info(f"Número total de secuencias: {len(sequences)}")
-    logger.info(f"Número de códigos WP encontrados: {len(wp_data)}")
+    logger.info(f"Número de códigos WP_ encontrados: {len(wp_data)}")
 
     # Verify each WP code in UniProt individually
     valid_wp_codes = {wp for wp in wp_data.values() if check_uniprot_single(wp)}
-
+    
     # Filter valid sequences
     valid_sequences = [
         seq for seq in sequences 
@@ -71,3 +72,204 @@ def filter_valid_sequences(input_fasta, output_fasta):
     SeqIO.write(valid_sequences, output_fasta, "fasta")
     print(f"Secuencias válidas después del filtrado: {len(valid_sequences)}")  # Debug: Show number of valid sequences
     logger.info(f"Resultados guardados en {output_fasta}")
+
+    try:
+        annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
+        print("annotate_uniprot_codes completed successfully.")
+    except Exception as e:
+        logger.warning(f"annotate_uniprot_codes failed: {e}")
+        print(f"Warning: Anotacion fallida: {e}")
+
+def extract_protein_name(protein_data):
+    """
+    Extrae el mejor nombre posible para la proteína:
+    1. recommendedName
+    2. submissionNames[0]
+    3. alternativeNames[0]
+    """
+    try:
+        return protein_data["recommendedName"]["fullName"]["value"]
+    except (KeyError, TypeError):
+        pass
+    try:
+        return protein_data["submissionNames"][0]["fullName"]["value"]
+    except (KeyError, IndexError, TypeError):
+        pass
+    try:
+        return protein_data["alternativeNames"][0]["fullName"]["value"]
+    except (KeyError, IndexError, TypeError):
+        pass
+    return "Not found"
+
+def extract_ec_number(protein_data):
+    """
+    Extrae el primer número EC si está presente.
+    """
+    try:
+        ec_list = protein_data.get("recommendedName", {}).get("ecNumbers", [])
+        if ec_list:
+            return ec_list[0]["value"]
+    except (KeyError, IndexError, TypeError):
+        pass
+    return "None"
+
+def get_cofactors_from_accession(accession):
+    """
+    Consulta UniProt con accession para extraer cofactores dentro de comments.
+    """
+    url_entry = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    try:
+        response = requests.get(url_entry)
+        response.raise_for_status()
+        entry = response.json()
+    except Exception as e:
+        print(f"❌ Error al obtener entrada UniProt para {accession}: {e}")
+        return "Error"
+
+    cofactors = []
+
+    comments = entry.get("comments")
+    if comments is None:
+        print(f"⚠️ 'comments' no existe para {accession}")
+        return "None"
+    if not isinstance(comments, list):
+        print(f"⚠️ 'comments' no es una lista para {accession}. Es: {type(comments)}")
+        return "None"
+
+    for comment in comments:
+        if comment.get("commentType") == "COFACTOR":
+            for cofactor in comment.get("cofactors", []):
+                name_field = cofactor.get("name")
+                if isinstance(name_field, dict):
+                    name = name_field.get("value")
+                elif isinstance(name_field, str):
+                    name = name_field
+                else:
+                    name = None
+                if name:
+                    cofactors.append(name)
+
+
+    return "; ".join(cofactors) if cofactors else "None"
+
+def get_pfam_domains_from_accession(accession):
+    """
+    Extrae dominios Pfam (id y EntryName) desde una entrada de UniProt.
+    """
+    url_entry = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    try:
+        response = requests.get(url_entry)
+        response.raise_for_status()
+        entry = response.json()
+    except Exception as e:
+        print(f"❌ Error al obtener Pfam para {accession}: {e}")
+        return "Error"
+
+    pfam_domains = []
+
+    for xref in entry.get("uniProtKBCrossReferences", []):
+        if xref.get("database") == "Pfam":
+            pfam_id = xref.get("id", "NoID")
+            entry_name = None
+            for prop in xref.get("properties", []):
+                if prop.get("key") == "EntryName":
+                    entry_name = prop.get("value", "NoEntryName")
+                    break
+            pfam_domains.append(f"{pfam_id} ({entry_name})" if entry_name else pfam_id)
+
+    return "; ".join(pfam_domains) if pfam_domains else "None"
+
+def get_alphafold_id_from_accession(accession):
+    """
+    Extrae el ID de AlphaFoldDB desde una entrada de UniProt.
+    """
+    url_entry = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
+    try:
+        response = requests.get(url_entry)
+        response.raise_for_status()
+        entry = response.json()
+    except Exception as e:
+        print(f"❌ Error al obtener AlphaFoldDB para {accession}: {e}")
+        return "Error"
+
+    for xref in entry.get("uniProtKBCrossReferences", []):
+        if xref.get("database") == "AlphaFoldDB":
+            return xref.get("id", "NoID")
+
+    return "None"
+
+def annotate_uniprot_codes(valid_wp_codes, output_file="annotation.csv"):
+    results = []
+
+    for wp in valid_wp_codes:
+        query_string = f"xref:RefSeq-{wp}"
+        params = {
+            "fields": "accession,organism_name,protein_name",
+            "query": query_string,
+            "format": "json"
+        }
+
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            data = response.json()
+
+            if data.get("results"):
+                for r in data["results"]:
+                    #print(f"DEBUG r: {r}")  # DEBUG
+
+                    protein_data = r.get("proteinDescription")
+                    if not isinstance(protein_data, dict):
+                        protein_data = {}
+
+                    protein_name = extract_protein_name(protein_data)
+                    ec_number = extract_ec_number(protein_data)
+                    accession = r.get("primaryAccession", "Not found")
+
+                    cofactors = get_cofactors_from_accession(accession) if accession != "Not found" else "None"
+                    pfam_domains = get_pfam_domains_from_accession(accession) if accession != "Not found" else "None"
+                    alphafold_id = get_alphafold_id_from_accession(accession) if accession != "Not found" else "None"
+
+
+
+                    results.append({
+                        "WP_code": wp,
+                        "UniProt_accession": accession,
+                        "Organism": r.get("organism", {}).get("scientificName", "Not found"),
+                        "Protein_name": protein_name,
+                        "EC_number": ec_number,
+                        "Cofactors": cofactors,
+                        "Pfam_domains": pfam_domains,
+                        "AlphaFoldDB_ID": alphafold_id
+                    })
+            else:
+                results.append({
+                    "WP_code": wp,
+                    "UniProt_accession": "Not found",
+                    "Organism": "Not found",
+                    "Protein_name": "Not found",
+                    "EC_number": "None",
+                    "Cofactors": "None",
+                    "Pfam_domains": "None",
+                    "AlphaFoldDB_ID": "None"
+                })
+        except Exception as e:
+            print(f"❌ Error al consultar {wp}: {e}")
+            results.append({
+                "WP_code": wp,
+                "UniProt_accession": "error",
+                "Organism": "error",
+                "Protein_name": "error",
+                "EC_number": "error",
+                "Cofactors": "error",
+                "Pfam_domains": "error",
+                "AlphaFoldDB_ID": "error"
+            })
+
+    with open(output_file, mode="w", newline="", encoding="utf-8") as file:
+        fieldnames = ["WP_code", "UniProt_accession", "Organism", "Protein_name", "EC_number", "Cofactors", "Pfam_domains", "AlphaFoldDB_ID"]
+        writer = csv.DictWriter(file, fieldnames=fieldnames, delimiter=';')
+        writer.writeheader()
+        writer.writerows(results)
+
+    print(f"✅ Archivo CSV generado: {output_file}")
