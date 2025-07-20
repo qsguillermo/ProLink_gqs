@@ -17,6 +17,7 @@ r"""
 
 import logging
 import os
+import requests
 from copy import deepcopy
 from datetime import datetime, timezone
 
