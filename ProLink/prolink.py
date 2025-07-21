@@ -30,7 +30,7 @@ from .modules.subprocess_functions import align, tree
 from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
 from .modules.uniprot_sequences import filter_valid_sequences
-from .modules.first_wp import , reorder_fasta_with_study_sequence
+from .modules.first_wp import get_wp_from_code, reorder_fasta_with_study_sequence
 
 logger = logging.getLogger()
 
@@ -201,6 +201,9 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             sequences_fastafile_pfam = f"{output_dir}/seqs_blast_pfam.fasta"
             pfam_output = f"{output_dir}/seqs_blast_pfam.txt"
             align_basename = f"{output_dir}/seqs_blast_aligned"
+
+        if wp_of_interest_first:
+            reorder_fasta_with_study_sequence
 
         if check_pfam_domains:
             logger.info("\nChecking Pfam domains")
