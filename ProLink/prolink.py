@@ -30,6 +30,7 @@ from .modules.subprocess_functions import align, tree
 from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
 from .modules.uniprot_sequences import filter_valid_sequences
+from .modules.first_wp import , reorder_fasta_with_study_sequence
 
 logger = logging.getLogger()
 
