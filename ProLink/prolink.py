@@ -31,60 +31,6 @@ from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
 from .modules.uniprot_sequences import filter_valid_sequences
 
-def get_wp_from_code(code: str) -> str:
-    """
-    Obtiene el código WP a partir de un código de entrada (como EMBL).
-    """
-    base_url = "https://rest.uniprot.org/uniprotkb/search"
-    params = {
-        "query": f"({code})",
-        "fields": "accession",
-        "format": "json"
-    }
-
-    try:
-        response = requests.get(base_url, params=params)
-        response.raise_for_status()
-        data = response.json()
-
-        if not data.get("results"):
-            return None
-
-        accession = data["results"][0].get("primaryAccession", None)
-        if not accession:
-            return None
-
-        # Obtener el WP desde la entrada
-        entry_url = f"https://rest.uniprot.org/uniprotkb/{accession}.json"
-        entry_resp = requests.get(entry_url)
-        entry_resp.raise_for_status()
-        entry = entry_resp.json()
-
-        for ref in entry.get("uniProtKBCrossReferences", []):
-            if ref.get("database") == "RefSeq":
-                wp = ref.get("id")
-                if wp and wp.startswith("WP_"):
-                    return wp
-        return None
-
-    except Exception as e:
-        print(f"❌ Error al obtener WP desde {code}: {e}")
-        return None
-
-from Bio import SeqIO
-
-def reorder_fasta_to_put_wp_first(fasta_file: str, wp_query: str) -> None:
-    """
-    Reordena el archivo FASTA para poner la secuencia cuyo ID contiene el WP como la primera.
-    """
-    records = list(SeqIO.parse(fasta_file, "fasta"))
-    for i, rec in enumerate(records):
-        if wp_query in rec.id:
-            records.insert(0, records.pop(i))  # mover al inicio
-            break
-    SeqIO.write(records, fasta_file, "fasta")
-
-
 logger = logging.getLogger()
 
 def pro_link(query:str, parameters_default:dict = parameters_default, **parameters) -> None:
@@ -254,12 +200,6 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             sequences_fastafile_pfam = f"{output_dir}/seqs_blast_pfam.fasta"
             pfam_output = f"{output_dir}/seqs_blast_pfam.txt"
             align_basename = f"{output_dir}/seqs_blast_aligned"
-
-
-        # Reordenar .fasta del clúster si wp_query está presente
-        if wp_query:
-            reorder_fasta_to_put_wp_first(cluster_results_fastafile, wp_query)
-
 
         if check_pfam_domains:
             logger.info("\nChecking Pfam domains")
