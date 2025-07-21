@@ -110,7 +110,6 @@ def reorder_fasta_with_study_sequence(txt_file, fasta_file, wp_of_interest, stud
 
 txt_file = "seqs_cluster.txt"
 fasta_file = "seqs_cluster.fasta"
-wp_of_interest = "WP_006015261.1"
-study_seq = "MSKMFTDLKRHGLNGPTMRTRWSAIFYAAADFDIAPLR..."  # tu secuencia aquí
+study_seq = "my_sequence.fasta"
 output_file = "seqs_cluster_interest.fasta"
 
