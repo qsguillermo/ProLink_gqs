@@ -85,6 +85,8 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
     identity_cluster_step = float(parameters['identity_cluster_step'])
     min_number_clusters = int(parameters['min_number_clusters'])
     max_number_clusters = int(parameters['max_number_clusters'])
+    # First_wp
+    wp_of_interest_first = bool(parameters['first_wp'])
     # Pfam domains
     check_pfam_domains = bool(parameters['check_pfam_domains'])
     # Alignment
