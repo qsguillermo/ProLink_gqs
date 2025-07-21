@@ -86,7 +86,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
     min_number_clusters = int(parameters['min_number_clusters'])
     max_number_clusters = int(parameters['max_number_clusters'])
     # First_wp
-    wp_of_interest_first = bool(parameters['first_wp'])
+    first_wp = bool(parameters['first_wp'])
     # Pfam domains
     check_pfam_domains = bool(parameters['check_pfam_domains'])
     # Alignment
@@ -204,7 +204,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             pfam_output = f"{output_dir}/seqs_blast_pfam.txt"
             align_basename = f"{output_dir}/seqs_blast_aligned"
 
-        if wp_of_interest_first:
+        if first_wp:
             logger.info(f"Looking for the WP of interest")
             reorder_fasta_with_study_sequence("seqs_cluster.txt", "seqs_cluster.fasta", "my_sequence.fasta", "seqs_cluster_interest.fasta")
 
