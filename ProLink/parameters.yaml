@@ -22,6 +22,9 @@ Clustering:
   min_number_clusters: 50
   max_number_clusters: 300
 
+Ordering:
+  first_wp: False
+
 Pfam domains:
   check_pfam_domains: False
 
