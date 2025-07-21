@@ -206,7 +206,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         if first_wp:
             logger.info(f"Looking for the WP of interest")
-            reorder_fasta_with_study_sequence("seqs_cluster.txt", "seqs_cluster.fasta", "my_sequence.fasta", "seqs_cluster_interest.fasta")
+            reorder_fasta_with_study_sequence("seqs_cluster.txt", "seqs_cluster.fasta", {wp_query}, "my_sequence.fasta", "seqs_cluster_interest.fasta")
 
         if check_pfam_domains:
             logger.info("\nChecking Pfam domains")
