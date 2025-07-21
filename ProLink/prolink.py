@@ -204,8 +204,8 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             pfam_output = f"{output_dir}/seqs_blast_pfam.txt"
             align_basename = f"{output_dir}/seqs_blast_aligned"
 
-        if first_wp and seqs_cluster:
-          logger.info(f"Looking for the WP of interest")
+        if first_wp:
+          logger.info(f"Entrando en el módulo de ordenar WP")
           reorder_fasta_with_study_sequence(
               os.path.join(output_dir, "seqs_cluster.txt"),
               os.path.join(output_dir, "seqs_cluster.fasta"),
