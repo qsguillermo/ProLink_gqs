@@ -171,7 +171,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         logger.info(f"WP de la query: {wp_query}")
 
         # Obtener el Nombre de la proteína desde su WP
-        protein_name = get_protein_name_from_wp(wp_query)
+        formatted_protein_name = get_protein_name_from_wp(wp_query)
 
 
         # Optional filtering of Uniprot Sequences
@@ -249,7 +249,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             if generate_tree:
                 logger.info("\nGenerating tree")
                 mega_output = f"{aligned_fastafile}.nwk"
-                tree(tree_type, bootstrap_replications, aligned_fastafile, mega_output, protein_name=protein_name)
+                tree(tree_type, bootstrap_replications, aligned_fastafile, mega_output, protein_name=formatted_protein_name)
         else:
             logger.info("\nSkipping alignment (and logo and tree))")
 
