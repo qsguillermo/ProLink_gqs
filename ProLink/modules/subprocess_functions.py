@@ -17,7 +17,8 @@ def clean_label(label, protein_name=""):
 
     # Elimina nombre de la proteína si está presente
     if protein_name:
-        protein_regex = re.escape(protein_name).replace(r'\_', r'[\s_]+')
+        protein_parts = re.split(r'[_\s]+', protein_name)
+        protein_regex = r'[\s_\-]*'.join(map(re.escape, protein_parts))
         label = re.sub(protein_regex, "", label, flags=re.IGNORECASE)
 
     # Limpieza previa de palabras específicas
@@ -53,7 +54,7 @@ def clean_label(label, protein_name=""):
 def clean_newick_string(newick_str, protein_name):
     if not protein_name:
         raise ValueError("❌ Se esperaba un nombre de proteína pero no ha llegado.")
-    print(f" [DEBUG] Nombre_de_la_proteína recibido clean_newick_string: {protein_name}")
+    print(f" [DEBUG] Nombre de_la proteína recibido clean_newick_string: {protein_name}")
     pattern = re.compile(
         r"('([^']+---C\d+[^']*)'|\"([^\"]+---C\d+[^\"]*)\"|([A-Za-z0-9 _\.\-]+---C\d+))",
         flags=re.IGNORECASE
