@@ -45,7 +45,7 @@ def align(muscle_input:str, muscle_output:str) -> None:
         logger.error(f"ERROR: MUSCLE failed")
         raise RuntimeError(f"MUSCLE failed")
 
-def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_output:str) -> None:
+def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_output:str, protein_name:str = "") -> None:
     mega_config_input = f"{ProLink_path}/mega_configs/{tree_type}_{bootstrap_replications}.mao"
     logging.info(f"\n-- Generating phylogenetic tree with MEGA-CC")
     mega_cmd = ['megacc', '-a', mega_config_input, '-d', muscle_output, '-o', mega_output]
@@ -72,7 +72,7 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
     try:
         with open(mega_output, 'r') as f:
             newick = f.read()
-        cleaned_newick = clean_newick_string(newick, protein_name='alkene_reductase')
+        cleaned_newick = clean_newick_string(newick, protein_name=protein_name)
         with open(mega_output, 'w') as f:
             f.write(cleaned_newick)
         logging.info(f"Cleaned Newick tree saved in '{mega_output}'")
