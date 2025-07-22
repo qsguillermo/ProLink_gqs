@@ -10,6 +10,7 @@ from .. import ProLink_path
 logger = logging.getLogger()
 
 def clean_label(label, protein_name=""):
+    print(f"[DEBUG] Usando protein_name para limpieza: {protein_name}")
     # Elimina códigos WP/XP/NP
     label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
     # Elimina "MULTISPECIES:" y descripciones
@@ -26,7 +27,10 @@ def clean_label(label, protein_name=""):
     label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', label)
     return label.strip(" _")
 
-def clean_newick_string(newick_str, protein_name='alkene_reductase'):
+def clean_newick_string(newick_str, protein_name):
+    if not protein_name:
+        raise ValueError("❌ Se esperaba un nombre de proteína pero no ha llegado.")
+    print(f" [DEBUG] Nombre de proteína recibido en clean_newick_string: {protein_name}")
     pattern = re.compile(
         r"('([^']+---C\d+[^']*)'|\"([^\"]+---C\d+[^\"]*)\"|([A-Za-z0-9 _\.\-]+---C\d+))",
         flags=re.IGNORECASE
@@ -45,7 +49,7 @@ def align(muscle_input:str, muscle_output:str) -> None:
         logger.error(f"ERROR: MUSCLE failed")
         raise RuntimeError(f"MUSCLE failed")
 
-def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_output:str, protein_name:str = "") -> None:
+def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_output:str, protein_name:str) -> None:
     mega_config_input = f"{ProLink_path}/mega_configs/{tree_type}_{bootstrap_replications}.mao"
     logging.info(f"\n-- Generating phylogenetic tree with MEGA-CC")
     mega_cmd = ['megacc', '-a', mega_config_input, '-d', muscle_output, '-o', mega_output]
