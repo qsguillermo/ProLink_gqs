@@ -168,10 +168,11 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         # Obtener WP del query
         wp_query = get_wp_from_code(query)
-        logger.info(f"WP de la query: {wp_query}")
+        logger.info(f"WP de la proteína: {wp_query}")
 
         # Obtener el Nombre de la proteína desde su WP
         formatted_protein_name = get_protein_name_from_wp(wp_query)
+        logger.info(f"Nombre de la proteína: {formatted_protein_name}")
 
 
         # Optional filtering of Uniprot Sequences
