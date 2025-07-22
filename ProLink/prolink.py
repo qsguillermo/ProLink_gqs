@@ -31,7 +31,7 @@ from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
 from .modules.uniprot_sequences import filter_valid_sequences
 from .modules.first_wp import get_wp_from_code, reorder_fasta_with_study_sequence
-from .modules.uniprot_utiles import get_protein_name_from_wp
+from .modules.uniprot_utils import get_protein_name_from_wp
 
 logger = logging.getLogger()
 
