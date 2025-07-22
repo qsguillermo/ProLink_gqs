@@ -24,8 +24,12 @@ def clean_label(label, protein_name=""):
     label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
     label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
     label = re.sub(r'[-]*', '', label).strip()
+    # Normaliza: convierte "Genus species" → "Genus_species"
+    label = re.sub(r'^([A-Z][a-z]+)\s+([a-z]+)', r'\1_\2', label)
     # Abrevia el género si no es sp., admitiendo varios separadores
     label = re.sub(r'^[-_\s]*([A-Z])[a-zA-Z0-9]+[\s_\-]+(?!sp[\s_\.\-])', r'\1_', label)
+    # Asegura guion bajo antes del marcador de clúster (Cx)
+    label = re.sub(r'(C\d+)$', r'_\1', label)
     return label.strip(" _")
 
 def clean_newick_string(newick_str, protein_name):
