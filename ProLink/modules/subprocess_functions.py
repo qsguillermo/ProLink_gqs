@@ -10,32 +10,50 @@ from .. import ProLink_path
 logger = logging.getLogger()
 
 def clean_label(label, protein_name=""):
-    print(f"[DEBUG] Usando protein_name para limpieza: {protein_name}")
     # Elimina códigos WP/XP/NP
     label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
     # Elimina "MULTISPECIES:" y descripciones
     label = re.sub(r'MULTISPECIES:\s*', '', label, flags=re.IGNORECASE)
+
     # Elimina nombre de la proteína si está presente
     if protein_name:
-        protein_parts = re.split(r'[_\s]+', protein_name)
-        protein_regex = r'[\s_\-]*'.join(map(re.escape, protein_parts))
+        protein_regex = re.escape(protein_name).replace(r'\_', r'[\s_]+')
         label = re.sub(protein_regex, "", label, flags=re.IGNORECASE)
-    # Otras limpiezas
+
+    # Limpieza previa de palabras específicas
     label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
     label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
-    label = re.sub(r'[-]*', '', label).strip()
-    # Normaliza: convierte "Genus species" → "Genus_species"
-    label = re.sub(r'^([A-Z][a-z]+)\s+([a-z]+)', r'\1_\2', label)
-    # Abrevia el género si no es sp., admitiendo varios separadores
-    label = re.sub(r'^[-_\s]*([A-Z])[a-zA-Z0-9]+[\s_\-]+(?!sp[\s_\.\-])', r'\1_', label)
-    # Asegura guion bajo antes del marcador de clúster (Cx)
-    label = re.sub(r'(C\d+)$', r'_\1', label)
+
+    # Abrevia el género SOLO si no es "sp." después
+    # Regex: busca inicio, opcional guiones bajos, una mayúscula + minúsculas,
+    # seguido de un separador (espacio o guion bajo),
+    # y ADEMÁS que NO venga "sp" o "sp." justo después
+    # En ese caso, reemplaza por inicial + guion bajo
+    label = re.sub(
+        r'^([_]*)([A-Z])[a-z]+([ _])(?!sp[\._]?)',
+        lambda m: f"{m.group(1)}{m.group(2)}_",
+        label,
+        flags=re.IGNORECASE
+    )
+
+    # Añade guion bajo antes del marcador de clúster (tipo C19, C38, etc),
+    # eliminando cualquier espacio que hubiera antes del marcador
+    label = re.sub(
+        r'\s*(C\d+)$',
+        r'_\1',
+        label
+    )
+
+    # Elimina todos los guiones que no formen parte del marcador de clúster
+    label = re.sub(r'-+', '', label).strip()
+
     return label.strip(" _")
+
 
 def clean_newick_string(newick_str, protein_name):
     if not protein_name:
         raise ValueError("❌ Se esperaba un nombre de proteína pero no ha llegado.")
-    print(f" [DEBUG] Protein name recibido clean_newick_string: {protein_name}")
+    print(f" [DEBUG] Nombre_de_la_proteína recibido clean_newick_string: {protein_name}")
     pattern = re.compile(
         r"('([^']+---C\d+[^']*)'|\"([^\"]+---C\d+[^\"]*)\"|([A-Za-z0-9 _\.\-]+---C\d+))",
         flags=re.IGNORECASE
