@@ -35,7 +35,7 @@ def clean_label(label, protein_name=""):
 def clean_newick_string(newick_str, protein_name):
     if not protein_name:
         raise ValueError("❌ Se esperaba un nombre de proteína pero no ha llegado.")
-    print(f" [DEBUG] Nombre de proteína recibido clean_newick_string: {protein_name}")
+    print(f" [DEBUG] Protein name recibido clean_newick_string: {protein_name}")
     pattern = re.compile(
         r"('([^']+---C\d+[^']*)'|\"([^\"]+---C\d+[^\"]*)\"|([A-Za-z0-9 _\.\-]+---C\d+))",
         flags=re.IGNORECASE
