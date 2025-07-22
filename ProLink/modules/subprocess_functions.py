@@ -17,14 +17,15 @@ def clean_label(label, protein_name=""):
     label = re.sub(r'MULTISPECIES:\s*', '', label, flags=re.IGNORECASE)
     # Elimina nombre de la proteína si está presente
     if protein_name:
-        protein_regex = re.escape(protein_name).replace(r'\_', r'[\s_]+')
+        protein_parts = re.split(r'[_\s]+', protein_name)
+        protein_regex = r'[\s_\-]*'.join(map(re.escape, protein_parts))
         label = re.sub(protein_regex, "", label, flags=re.IGNORECASE)
     # Otras limpiezas
     label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
     label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
     label = re.sub(r'[-]*', '', label).strip()
-    # Abrevia el género si no es sp.
-    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', label)
+    # Abrevia el género si no es sp., admitiendo varios separadores
+    label = re.sub(r'^[-_\s]*([A-Z])[a-zA-Z0-9]+[\s_\-]+(?!sp[\s_\.\-])', r'\1_', label)
     return label.strip(" _")
 
 def clean_newick_string(newick_str, protein_name):
