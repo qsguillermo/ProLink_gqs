@@ -31,6 +31,7 @@ from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
 from .modules.uniprot_sequences import filter_valid_sequences
 from .modules.first_wp import get_wp_from_code, reorder_fasta_with_study_sequence
+from .modules.uniprot_utiles import get_protein_name_from_wp
 
 logger = logging.getLogger()
 
@@ -169,6 +170,9 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         wp_query = get_wp_from_code(query)
         logger.info(f"WP de la query: {wp_query}")
 
+        # Obtener el Nombre de la proteína desde su WP
+        protein_name = get_protein_name_from_wp(wp_query)
+
 
         # Optional filtering of Uniprot Sequences
         if filter_uniprot:
@@ -245,7 +249,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             if generate_tree:
                 logger.info("\nGenerating tree")
                 mega_output = f"{aligned_fastafile}.nwk"
-                tree(tree_type, bootstrap_replications, aligned_fastafile, mega_output)
+                tree(tree_type, bootstrap_replications, aligned_fastafile, mega_output, protein_name=protein_name)
         else:
             logger.info("\nSkipping alignment (and logo and tree))")
 
