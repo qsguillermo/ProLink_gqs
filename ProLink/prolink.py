@@ -29,6 +29,7 @@ from .modules.subprocess_functions import align, tree
 from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
 from .modules.uniprot_sequences import filter_valid_sequences
+from .modules.ligands import annotate_ligands_from_fasta
 
 logger = logging.getLogger()
 
@@ -161,8 +162,15 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         check_seq_in(seq_record, found_sequences_fastafile, rewrite=True, spaces=False)
 
+      # Ligands annotation
+        if ligands:
+          logger.info(f"Intentando anotar ligandos")
+          annotate_ligands_from_fasta(
+            os.path.join(output_dir, "seqs_blast.fasta"),
+            output__csv = "ligands_csv"
+          )
       
-        # Optional filtering of Uniprot Sequences
+      # Optional filtering of Uniprot Sequences
         if filter_uniprot:
           filtered_sequences_fastafile = f"{output_dir}/seqs_blast_filtered.fasta"
           logger.info(f"\n###  Filtering  ###\n")
