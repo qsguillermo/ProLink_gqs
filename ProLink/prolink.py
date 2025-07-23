@@ -168,7 +168,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             try:
                 annotate_ligands_from_fasta(
                     os.path.join(output_dir, "seqs_blast.fasta"),
-                    output__csv=os.path.join(output_dir, "ligands.csv")
+                    output_csv=os.path.join(output_dir, "ligands.csv")
                 )
                 logger.info("Anotación de ligandos completada correctamente")
             except Exception as e:
