@@ -164,7 +164,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
       # Ligands annotation
         if parameters.get('ligands', False):
-            logger.info("Intentando anotar ligandos")
+            logger.info("Intentando anotar ligandos_logger")
             try:
                 annotate_ligands_from_fasta(
                     os.path.join(output_dir, "seqs_blast.fasta"),
