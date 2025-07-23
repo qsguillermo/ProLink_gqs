@@ -173,7 +173,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
                 logger.info("Anotación de ligandos completada correctamente")
             except Exception as e:
                 logger.debug("Error en annotate_ligands_from_fasta", exc_info=True)
-              logger.warning(f"WARNING: Anotación de ligandos fallida: {e}")
+                logger.warning(f"WARNING: Anotación de ligandos fallida: {e}")
 
       
       # Optional filtering of Uniprot Sequences
