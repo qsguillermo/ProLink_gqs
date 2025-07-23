@@ -5,6 +5,7 @@ from Bio import SeqIO
 
 def extract_pdb_codes_from_fasta(fasta_file):
     """Extrae códigos PDB del archivo FASTA"""
+    logger.info("Intentando extraer códigos PDB del FASTA")
     sequences = list(SeqIO.parse(fasta_file, "fasta"))
     pdb_codes = set()
 
@@ -47,6 +48,7 @@ def get_ligands_from_pdb(pdb_code):
 
 def annotate_ligands_from_fasta(fasta_file, output_csv):
     """Función final que extrae códigos PDB y anota sus ligandos en un CSV"""
+    logger.info("Entrando en annotate_ligands_from_fasta")
     pdb_codes = extract_pdb_codes_from_fasta(fasta_file)
     print(f"Códigos PDB encontrados: {pdb_codes}")
 
