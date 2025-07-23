@@ -69,3 +69,5 @@ def annotate_ligands_from_fasta(fasta_file, output_csv):
         writer = csv.writer(csvfile, delimiter=';')  # Separador compatible con Excel español
         writer.writerow(headers)
         writer.writerows(all_data)
+
+    print(f"✅ Archivo CSV generado: {output_csv}")
