@@ -67,7 +67,7 @@ def annotate_ligands_from_fasta(fasta_file, output_csv):
     for i in range(1, max_ligands + 1):
         headers.extend([f"Ligand {i}", f"Name {i}"])
 
-    logger.debug(f"Ruta del CSV de salida: {output__csv}")
+    logger.debug(f"Ruta del CSV de salida: {output_csv}")
     with open(output_csv, "w", newline='', encoding='utf-8') as csvfile:
         writer = csv.writer(csvfile, delimiter=';')  # Separador compatible con Excel español
         writer.writerow(headers)
