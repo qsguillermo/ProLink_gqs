@@ -163,12 +163,13 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         check_seq_in(seq_record, found_sequences_fastafile, rewrite=True, spaces=False)
 
       # Ligands annotation
-        if ligands:
-          logger.info(f"Intentando anotar ligandos")
-          annotate_ligands_from_fasta(
+        if parameters.get('ligands', False):
+        logger.info("Intentando anotar ligandos")
+        annotate_ligands_from_fasta(
             os.path.join(output_dir, "seqs_blast.fasta"),
-            output__csv = "ligands_csv"
-          )
+            output__csv=os.path.join(output_dir, "ligands.csv")
+        )
+
       
       # Optional filtering of Uniprot Sequences
         if filter_uniprot:
