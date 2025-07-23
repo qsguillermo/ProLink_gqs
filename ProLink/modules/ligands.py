@@ -4,6 +4,8 @@ import requests
 import csv
 from Bio import SeqIO
 
+logger = logging.getLogger()
+
 def extract_pdb_codes_from_fasta(fasta_file):
     """Extrae códigos PDB del archivo FASTA"""
     logger.info("Intentando extraer códigos PDB del FASTA")
