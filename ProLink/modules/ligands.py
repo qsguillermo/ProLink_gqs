@@ -1,3 +1,4 @@
+import logging
 import re
 import requests
 import csv
@@ -10,7 +11,7 @@ def extract_pdb_codes_from_fasta(fasta_file):
     pdb_codes = set()
 
     for seq in sequences:
-        match = re.search(r'\b([A-Za-z0-9]{4}_[A-Za-z])\b', seq.description)
+        match = re.search(r'\b([A-Za-z0-9]{4})_[A-Za-z]\b', seq.description)
         if match:
             code = match.group(1).split("_")[0]  # Solo los 4 caracteres antes del "_"
             pdb_codes.add(code.upper())
