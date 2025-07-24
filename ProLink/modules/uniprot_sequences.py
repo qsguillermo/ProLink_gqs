@@ -61,6 +61,8 @@ def filter_valid_sequences(input_fasta, output_fasta):
 
     # Verify each WP code in UniProt individually
     valid_wp_codes = {wp for wp in wp_data.values() if check_uniprot_single(wp)}
+
+    return valid_wp_codes
     
     # Filter valid sequences
     valid_sequences = [
