@@ -180,7 +180,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         #optional annotation
         if annotation_uniprot:
-          logger.info(f"\n###  Annotating3  ###\n")
+          logger.info(f"\n###  Annotating  ###\n")
           try:
               annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
               print("annotate_uniprot_codes completed successfully.")
