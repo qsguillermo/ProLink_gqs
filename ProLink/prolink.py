@@ -180,9 +180,9 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         #optional annotation
         if annotation_uniprot:
-          valid_wp_codes = filter_valid_sequences()
           logger.info(f"\n###  Annotating2  ###\n")
           try:
+              valid_wp_codes = filter_valid_sequences(found_sequences_fastafile, filtered_sequences_fastafile)
               annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
               print("annotate_uniprot_codes completed successfully.")
           except Exception as e:
