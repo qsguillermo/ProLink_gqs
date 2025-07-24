@@ -209,7 +209,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
             pfam_output = f"{output_dir}/seqs_blast_pfam.txt"
             align_basename = f"{output_dir}/seqs_blast_aligned"
 
-        if first_wp:
+        ''' if first_wp:
           logger.info(f"Entrando en el módulo de ordenar WP")
           reorder_fasta_with_study_sequence(
               os.path.join(output_dir, "seqs_cluster.txt"),
@@ -218,7 +218,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
               os.path.join(output_dir, "my_sequence.fasta"),
               os.path.join(output_dir, "seqs_cluster_interest.fasta")
           )
-          sequences_fastafile = os.path.join(output_dir, "seqs_cluster_interest.fasta")
+          sequences_fastafile = os.path.join(output_dir, "seqs_cluster_interest.fasta") '''
 
 
         if check_pfam_domains:
