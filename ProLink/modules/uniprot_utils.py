@@ -1,63 +1,28 @@
 import requests
-
-def extract_protein_name(protein_data):
-    """
-    Extrae el mejor nombre posible para la proteína:
-    1. recommendedName
-    2. submissionNames[0]
-    3. alternativeNames[0]
-    """
-    try:
-        return protein_data["recommendedName"]["fullName"]["value"]
-    except (KeyError, TypeError):
-        pass
-    try:
-        return protein_data["submissionNames"][0]["fullName"]["value"]
-    except (KeyError, IndexError, TypeError):
-        pass
-    try:
-        return protein_data["alternativeNames"][0]["fullName"]["value"]
-    except (KeyError, IndexError, TypeError):
-        pass
-    return None
-
-def format_protein_name_for_matching(protein_name):
-    """
-    Convierte el nombre de proteína para que coincida mejor con los labels:
-    - Espacios → guiones bajos
-    - Palabras en Title Case → minúsculas
-    """
-    if not protein_name:
-        return ""
-    parts = protein_name.split()
-    formatted_parts = [
-        part.lower() if part.istitle() else part
-        for part in parts
-    ]
-    return "_".join(formatted_parts)
+from xml.etree import ElementTree
 
 def get_protein_name_from_wp(wp_code):
-    """
-    Dado un código WP, devuelve el nombre formateado de la proteína.
-    """
-    url = "https://rest.uniprot.org/uniprotkb/search"
-    params = {
-        "fields": "accession,protein_name",
-        "query": f"xref:RefSeq-{wp_code}",
-        "format": "json"
-    }
+    base_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/"
+    
+    # Paso 1: obtener el UID (NCBI ID)
+    esearch_url = f"{base_url}esearch.fcgi?db=protein&term={wp_code}&retmode=xml"
+    esearch_response = requests.get(esearch_url)
+    esearch_root = ElementTree.fromstring(esearch_response.content)
+    uid = esearch_root.findtext(".//Id")
 
-    try:
-        response = requests.get(url, params=params)
-        response.raise_for_status()
-        data = response.json()
-        results = data.get("results", [])
-        if not results:
-            print(f"⚠️ No se encontró ninguna entrada para {wp_code}")
-            return ""
-        protein_data = results[0].get("proteinDescription", {})
-        raw_name = extract_protein_name(protein_data)
-        return format_protein_name_for_matching(raw_name)
-    except Exception as e:
-        print(f"❌ Error al consultar UniProt para {wp_code}: {e}")
-        return ""
+    if not uid:
+        raise ValueError(f"No se encontró un UID para el código {wp_code}")
+
+    # Paso 2: obtener el nombre (Title)
+    esummary_url = f"{base_url}esummary.fcgi?db=protein&id={uid}&retmode=xml"
+    esummary_response = requests.get(esummary_url)
+    esummary_root = ElementTree.fromstring(esummary_response.content)
+    title = esummary_root.findtext(".//Item[@Name='Title']")
+
+    if not title:
+        raise ValueError(f"No se encontró un título para el UID {uid}")
+
+    # Paso 3: eliminar la parte entre corchetes (especie)
+    clean_name = title.split(" [")[0].strip()
+
+    return clean_name
