@@ -21,7 +21,7 @@ def clean_label(label, protein_name='FAD:protein FMN transferase'):
     # Elimina guiones o caracteres residuales
     label = re.sub(r'[-]*', '', label).strip()
     # Abrevia el género si no es sp.
-    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', label)
+    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+[\s_](?!sp[\s\._])', r'\1_', label)
     return label.strip(" _")
 
 def clean_newick_string(newick_str, protein_name='FAD:protein FMN transferase'):
