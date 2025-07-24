@@ -9,12 +9,12 @@ from .. import ProLink_path
 
 logger = logging.getLogger()
 
-def clean_label(label, protein_name='alkene_reductase'):
+def clean_label(label, protein_name='FAD:protein FMN transferase'):
     # Elimina códigos WP/XP/NP
     label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
     # Elimina "MULTISPECIES:" y descripciones
     label = re.sub(r'MULTISPECIES:\s*', '', label, flags=re.IGNORECASE)
-    label = re.sub(r'alkene[\s_]+reductase', '', label, flags=re.IGNORECASE)
+    label = re.sub(r'FAD:protein[\s_]+FMN[\s_]+transferase', '', label, flags=re.IGNORECASE)
     label = re.sub(r'nitroreductase[\s_]+family[\s_]+protein', '', label, flags=re.IGNORECASE)
     label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
     label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
@@ -24,7 +24,7 @@ def clean_label(label, protein_name='alkene_reductase'):
     label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+_(?!sp[\._])', r'\1_', label)
     return label.strip(" _")
 
-def clean_newick_string(newick_str, protein_name='alkene_reductase'):
+def clean_newick_string(newick_str, protein_name='FAD:protein FMN transferase'):
     pattern = re.compile(
         r"('([^']+---C\d+[^']*)'|\"([^\"]+---C\d+[^\"]*)\"|([A-Za-z0-9 _\.\-]+---C\d+))",
         flags=re.IGNORECASE
@@ -71,7 +71,7 @@ def tree(tree_type:str, bootstrap_replications:int, muscle_output:str, mega_outp
     try:
         with open(mega_output, 'r') as f:
             newick = f.read()
-        cleaned_newick = clean_newick_string(newick, protein_name='alkene_reductase')
+        cleaned_newick = clean_newick_string(newick, protein_name='FAD:protein FMN transferase')
         with open(mega_output, 'w') as f:
             f.write(cleaned_newick)
         logging.info(f"Cleaned Newick tree saved in '{mega_output}'")
