@@ -168,7 +168,7 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         if filter_uniprot:
           filtered_sequences_fastafile = f"{output_dir}/seqs_blast_filtered.fasta"
           logger.info(f"\n###  Filtering  ###\n")
-          filter_valid_sequences(found_sequences_fastafile, filtered_sequences_fastafile)
+          valid_wp_codes = filter_valid_sequences(found_sequences_fastafile, filtered_sequences_fastafile)
           # Verificar si el archivo filtrado tiene contenido
           if os.path.exists(filtered_sequences_fastafile) and os.path.getsize(filtered_sequences_fastafile) > 0:
             print(f"Filtered file in: {filtered_sequences_fastafile}")
@@ -180,9 +180,8 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
 
         #optional annotation
         if annotation_uniprot:
-          logger.info(f"\n###  Annotating2  ###\n")
+          logger.info(f"\n###  Annotating3  ###\n")
           try:
-              valid_wp_codes = filter_valid_sequences(found_sequences_fastafile, filtered_sequences_fastafile)
               annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
               print("annotate_uniprot_codes completed successfully.")
           except Exception as e:
