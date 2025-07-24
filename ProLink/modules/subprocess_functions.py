@@ -25,29 +25,11 @@ def clean_label(label, protein_name=""):
     label = re.sub(r'unclassified', '', label, flags=re.IGNORECASE)
     label = re.sub(r'Same[\s_]+Domains', '', label, flags=re.IGNORECASE)
 
+    label = re.sub(r'[-]*', '', label).strip()
+
     # Abrevia el género SOLO si no es "sp." después
-    # Regex: busca inicio, opcional guiones bajos, una mayúscula + minúsculas,
-    # seguido de un separador (espacio o guion bajo),
-    # y ADEMÁS que NO venga "sp" o "sp." justo después
-    # En ese caso, reemplaza por inicial + guion bajo
-    label = re.sub(
-        r'^([_]*)([A-Z])[a-z]+([ _])(?!sp[\._]?)',
-        lambda m: f"{m.group(1)}{m.group(2)}_",
-        label,
-        flags=re.IGNORECASE
-    )
-
-    # Añade guion bajo antes del marcador de clúster (tipo C19, C38, etc),
-    # eliminando cualquier espacio que hubiera antes del marcador
-    label = re.sub(
-        r'\s*(C\d+)$',
-        r'_\1',
-        label
-    )
-
-    # Elimina todos los guiones que no formen parte del marcador de clúster
-    label = re.sub(r'-+', '', label).strip()
-
+    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+[\s_](?!sp[\s\._])', r'\1_', label)
+    
     return label.strip(" _")
 
 
