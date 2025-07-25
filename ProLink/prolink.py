@@ -28,7 +28,8 @@ from .modules.pfam import pfam_fasta
 from .modules.subprocess_functions import align, tree
 from .modules.trim import trim_align
 from .modules.weblogo import weblogo3
-from .modules.uniprot_sequences import filter_valid_sequences, annotate_uniprot_codes
+from .modules.uniprot_sequences import filter_valid_sequences
+from .modules.annotation import annotate_uniprot_codes
 
 logger = logging.getLogger()
 
@@ -182,7 +183,13 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
         if annotation_uniprot:
           logger.info(f"\n###  Annotating  ###\n")
           try:
-              annotate_uniprot_codes(valid_wp_codes)  # Call the annotation function
+              annotate_uniprot_codes(valid_wp_codes, output_file="anotacion.csv",
+                       incluir_organismo=incluir_organismo,
+                       incluir_nombre=incluir_nombre,
+                       incluir_ec=incluir_ec,
+                       incluir_cofactores=incluir_cofactores,
+                       incluir_pfam=incluir_pfam,
+                       incluir_alphafold=incluir_alphafold)
               print("annotate_uniprot_codes completed successfully.")
           except Exception as e:
               logger.warning(f"annotate_uniprot_codes failed: {e}")
