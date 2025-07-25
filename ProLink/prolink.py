@@ -79,6 +79,12 @@ def pro_link(query:str, parameters_default:dict = parameters_default, **paramete
     filter_uniprot = bool(parameters['filter_uniprot'])
     #Annotation
     annotation_uniprot = bool(parameters['annotation_uniprot'])
+    incluir_organismo = bool(parameters['incluir_organismo'])
+    incluir_nombre = bool(parameters['incluir_nombre'])
+    incluir_ec = bool(parameters['incluir_ec'])
+    incluir_cofactores = bool(parameters['incluir_cofactores'])
+    incluir_pfam = bool(parameters['incluir_pfam'])
+    incluir_alphafold = bool(parameters['incluir_alphafold'])
     # Clustering
     cluster_seqs = bool(parameters['cluster_seqs'])
     identity_cluster = float(parameters['identity_cluster'])
