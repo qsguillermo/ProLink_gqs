@@ -10,8 +10,12 @@ from .. import ProLink_path
 logger = logging.getLogger()
 
 def clean_label(label, protein_name=""):
+    # Elimina comillas iniciales y finales si existen
+    label = label.strip("'\"")
+
     # Elimina códigos WP/XP/NP
     label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
+
     # Elimina "MULTISPECIES:" y descripciones
     label = re.sub(r'MULTISPECIES:\s*', '', label, flags=re.IGNORECASE)
 
@@ -27,9 +31,13 @@ def clean_label(label, protein_name=""):
 
     label = re.sub(r'[-]*', '', label).strip()
 
-    # Abrevia el género SOLO si no es "sp." después
-    label = re.sub(r'^([_]*[A-Z])[a-zA-Z0-9]+[\s_](?!sp[\s\._])', r'\1_', label)
-    
+    # Abrevia el género SOLO si hay al menos dos palabras y la segunda no es "sp."
+    label = re.sub(
+        r"^[\s_]*([A-Z])[a-zA-Z0-9]+[\s_]+(?!sp[\s\._])([a-z]+)",
+        r"\1_\2",
+        label
+    )
+
     return label.strip(" _")
 
 
