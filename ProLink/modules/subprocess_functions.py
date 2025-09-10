@@ -10,8 +10,6 @@ from .. import ProLink_path
 logger = logging.getLogger()
 
 def clean_label(label, protein_name=""):
-    # Elimina comillas iniciales y finales si existen
-    label = label.strip("'\"")
 
     # Elimina códigos WP/XP/NP
     label = re.sub(r'(W|X|N)P[\s_]\d{9}\.\d', '', label)
