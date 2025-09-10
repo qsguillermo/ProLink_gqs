@@ -29,6 +29,9 @@ def clean_label(label, protein_name=""):
 
     label = re.sub(r'[-]*', '', label).strip()
 
+    # Elimina comillas iniciales y finales si existen
+    label = label.strip("'\"")
+
     # Abrevia el género SOLO si hay al menos dos palabras y la segunda no es "sp."
     label = re.sub(
         r"^[\s_]*([A-Z])[a-zA-Z0-9]+[\s_]+(?!sp[\s\._])([a-z]+)",
